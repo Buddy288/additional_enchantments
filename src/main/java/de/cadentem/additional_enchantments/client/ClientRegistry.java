@@ -22,6 +22,10 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientRegistry {
     @SubscribeEvent
     public static void registerKeys(final RegisterKeyMappingsEvent event) {
+        KeyHandler.CYCLE_TREASURE_FINDER = new KeyMapping("keybind.additional_enchantments.cycle_treasure_finder", InputConstants.KEY_Y, "keybind.additional_enchantments.category");
+        KeyHandler.CYCLE_TREASURE_FINDER.setKeyConflictContext(KeyConflictContext.IN_GAME);
+        event.register(KeyHandler.CYCLE_TREASURE_FINDER);
+        
         KeyHandler.CYCLE_TIPPED = new KeyMapping("keybind.additional_enchantments.cycle_tipped", InputConstants.KEY_G, "keybind.additional_enchantments.category");
         KeyHandler.CYCLE_TIPPED.setKeyConflictContext(KeyConflictContext.IN_GAME);
         event.register(KeyHandler.CYCLE_TIPPED);
