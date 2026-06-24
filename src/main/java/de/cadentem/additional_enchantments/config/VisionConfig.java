@@ -88,6 +88,28 @@ public class VisionConfig {
         return 8.0 + (enchantmentLevel * 2.0);
     }
 
+    public static List<String> getResourceNames() {
+        List<String> names = new ArrayList<>();
+    
+        for (ResourceKey<Block> key : DATA.keySet()) {
+            String path = key.location().getPath();
+            // Strips "ores/" prefix if present, e.g. "ores/diamond" -> "diamond"
+            if (path.contains("/")) {
+                path = path.substring(path.lastIndexOf("/") + 1);
+            }
+            if (!names.contains(path)) {
+                names.add(path);
+            }
+        }
+    
+        // Also add treasure if configured
+        if (SPECIAL_BLOCK_DATA.containsKey(SpecialBlock.TREASURE)) {
+            names.add(0, "treasure");
+        }
+    
+        return names;
+    }
+
     public static void updateFromReload(final TagsUpdatedEvent event) {
         reload(event.getRegistryAccess());
     }
