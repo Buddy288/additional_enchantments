@@ -46,6 +46,10 @@ public class TreasureFinderEnchantment extends ConfigurableEnchantment {
             CLIENT_CACHE.put(localPlayer.getStringUUID(), data);
         }
 
+        public enum Mode {
+            ON, OFF, SPECIFIC
+        }
+
         return data.getSecond();
     }
 }
