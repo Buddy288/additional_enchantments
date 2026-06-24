@@ -49,6 +49,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import de.cadentem.additional_enchantments.capability.PlayerDataProvider;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class VisionHandler {
@@ -181,31 +183,49 @@ public class VisionHandler {
 
         REMOVAL.clear();
 
-        RENDER_DATA.forEach((position, data) -> {
-            if (!data.isInRange(player.getEyePosition(), VisionConfig.getMaxRange(enchantmentLevel))) {
-                return;
-            }
-
-            if (((FrustumAccess) event.getFrustum()).additional_enchantments$cubeInFrustum(data.x(), data.y(), data.z(), data.x() + 1, data.y() + 1, data.z() + 1)) {
-                switch (data.visionData().displayType()) {
-                    case X_RAY_OUTLINE -> drawLines(buffer, pose.last(), data.x(), data.y(), data.z(), data.x() + 1, data.y() + 1, data.z() + 1, data.getColor());
-                    case GLOW -> SHADER_RENDER_DATA.add(data);
-                    case PARTICLES -> {
-                        // Newly added particles will only render once the game is un-paused
-                        // Meaning if we don't skip here, all the added particles will be shown at once
-                        if (!Minecraft.getInstance().isPaused() && player.tickCount % ServerConfig.TREASURE_FINDER_PARTICLE_RATE.get() == 0) {
-                            // Increase the bounding box to make the particles more visible for blocks in walls etc.
-                            double x = (data.x() + 0.5) + (player.getRandom().nextDouble() - 0.5) * 2;
-                            double y = (data.y() + 0.5) + (player.getRandom().nextDouble() - 0.5) * 2;
-                            double z = (data.z() + 0.5) + (player.getRandom().nextDouble() - 0.5) * 2;
-                            //noinspection deprecation -> key is present
-                            player.level().addParticle(AEParticles.GLOW.get(), x, y, z, map.getId(data.state().getBlock().builtInRegistryHolder()), enchantmentLevel, 0);
+        TreasureFinderEnchantment.Mode currentMode = PlayerDataProvider.getCapability(player)
+            .map(d -> d.treasureFinderMode)
+            .orElse(TreasureFinderEnchantment.Mode.ON);
+        
+        List<String> targets = VisionConfig.getResourceNames();
+        String currentTarget = PlayerDataProvider.getCapability(player)
+            .map(d -> targets.isEmpty() ? "" : targets.get(d.treasureFinderTargetIndex % Math.max(1, targets.size())))
+            .orElse("");
+        
+        if (currentMode != TreasureFinderEnchantment.Mode.OFF) {
+            RENDER_DATA.forEach((position, data) -> {
+                if (!data.isInRange(player.getEyePosition(), VisionConfig.getMaxRange(enchantmentLevel))) {
+                    return;
+                }
+        
+                if (currentMode == TreasureFinderEnchantment.Mode.SPECIFIC) {
+                    String path = data.state().getBlock().builtInRegistryHolder().key().location().getPath();
+                    if (path.contains("/")) {
+                        path = path.substring(path.lastIndexOf("/") + 1);
+                    }
+                    if (!path.equals(currentTarget)) {
+                        return;
+                    }
+                }
+        
+                if (((FrustumAccess) event.getFrustum()).additional_enchantments$cubeInFrustum(data.x(), data.y(), data.z(), data.x() + 1, data.y() + 1, data.z() + 1)) {
+                    switch (data.visionData().displayType()) {
+                        case X_RAY_OUTLINE -> drawLines(buffer, pose.last(), data.x(), data.y(), data.z(), data.x() + 1, data.y() + 1, data.z() + 1, data.getColor());
+                        case GLOW -> SHADER_RENDER_DATA.add(data);
+                        case PARTICLES -> {
+                            if (!Minecraft.getInstance().isPaused() && player.tickCount % ServerConfig.TREASURE_FINDER_PARTICLE_RATE.get() == 0) {
+                                double x = (data.x() + 0.5) + (player.getRandom().nextDouble() - 0.5) * 2;
+                                double y = (data.y() + 0.5) + (player.getRandom().nextDouble() - 0.5) * 2;
+                                double z = (data.z() + 0.5) + (player.getRandom().nextDouble() - 0.5) * 2;
+                                //noinspection deprecation -> key is present
+                                player.level().addParticle(AEParticles.GLOW.get(), x, y, z, map.getId(data.state().getBlock().builtInRegistryHolder()), enchantmentLevel, 0);
+                            }
                         }
                     }
                 }
-            }
-        });
-
+            });
+        }
+        
         tesselator.end();
         pose.popPose();
 
