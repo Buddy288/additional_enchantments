@@ -12,6 +12,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import de.cadentem.additional_enchantments.config.VisionConfig;
+import de.cadentem.additional_enchantments.enchantments.TreasureFinderEnchantment;
+import java.util.List;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,6 +25,7 @@ public class KeyHandler {
     public static KeyMapping CYCLE_EXPLOSIVE_TIP;
     public static KeyMapping CYCLE_PERCEPTION;
     public static KeyMapping CYCLE_VOIDING;
+    public static KeyMapping CYCLE_TREASURE_FINDER;
 
     private static int LAST_PRESS_TICK;
 
@@ -85,6 +89,28 @@ public class KeyHandler {
                     PlayerDataProvider.getCapability(localPlayer).ifPresent(data -> {
                         data.cycleDisplayType();
                         localPlayer.sendSystemMessage(Component.translatable("message.additional_enchantments.cycled_configuration", "Perception (display type)", data.displayType.name()));
+                        playerDataChanged.set(true);
+                    });
+                }
+            }
+        }
+
+        if (event.getKey() == CYCLE_TREASURE_FINDER.getKey().getValue()) {
+            if (TreasureFinderEnchantment.getClientEnchantmentLevel() > 0) {
+                if (localPlayer.isShiftKeyDown()) {
+                    List<String> targets = VisionConfig.getResourceNames();
+                    if (!targets.isEmpty()) {
+                        PlayerDataProvider.getCapability(localPlayer).ifPresent(data -> {
+                            data.cycleTreasureFinderTarget(targets.size());
+                            String target = targets.get(data.treasureFinderTargetIndex);
+                            localPlayer.sendSystemMessage(Component.translatable("message.additional_enchantments.cycled_configuration", "Treasure Finder (target)", target));
+                            playerDataChanged.set(true);
+                        });
+                    }
+                } else {
+                    PlayerDataProvider.getCapability(localPlayer).ifPresent(data -> {
+                        data.cycleTreasureFinderMode();
+                        localPlayer.sendSystemMessage(Component.translatable("message.additional_enchantments.cycled_configuration", "Treasure Finder (mode)", data.treasureFinderMode.name()));
                         playerDataChanged.set(true);
                     });
                 }
