@@ -19,6 +19,8 @@ public class PlayerData {
     public PerceptionEnchantment.DisplayType displayType = PerceptionEnchantment.DisplayType.ALL;
     public Rarity itemFilter = Rarity.COMMON;
     public VoidingEnchantment.State voidingState = VoidingEnchantment.State.ENABLED;
+    public TreasureFinderEnchantment.Mode treasureFinderMode = TreasureFinderEnchantment.Mode.ON;
+    public int treasureFinderTargetIndex = 0;
 
     // Not synced
     private int hunterStacks;
@@ -28,6 +30,14 @@ public class PlayerData {
 
     // Client only
     private int delayStacks;
+
+    public void cycleTreasureFinderMode() {
+        treasureFinderMode = (TreasureFinderEnchantment.Mode) cycle(treasureFinderMode);
+    }
+        
+    public void cycleTreasureFinderTarget(int maxIndex) {
+        treasureFinderTargetIndex = (treasureFinderTargetIndex + 1) % maxIndex;
+    }
 
     public void cycleEffectFilter() {
         effectFilter = (MobEffectCategory) cycle(effectFilter);
@@ -133,6 +143,8 @@ public class PlayerData {
         tag.putInt("displayType", displayType.ordinal());
         tag.putInt("itemFilter", itemFilter.ordinal());
         tag.putInt("voidingState", voidingState.ordinal());
+        tag.putInt("treasureFinderMode", treasureFinderMode.ordinal());
+        tag.putInt("treasureFinderTargetIndex", treasureFinderTargetIndex);
         return tag;
     }
 
@@ -144,5 +156,7 @@ public class PlayerData {
         displayType = PerceptionEnchantment.DisplayType.values()[tag.getInt("displayType")];
         itemFilter = Rarity.values()[tag.getInt("itemFilter")];
         voidingState = VoidingEnchantment.State.values()[tag.getInt("voidingState")];
+        treasureFinderMode = TreasureFinderEnchantment.Mode.values()[tag.getInt("treasureFinderMode")];
+        treasureFinderTargetIndex = tag.getInt("treasureFinderTargetIndex");
     }
 }
