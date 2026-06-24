@@ -182,7 +182,7 @@ public class VisionHandler {
         REMOVAL.clear();
 
         RENDER_DATA.forEach((position, data) -> {
-            if (data.visionData().range() == 0 || !data.isInRange(player.getEyePosition(), data.visionData().range())) {
+            if (!data.isInRange(player.getEyePosition(), VisionConfig.getMaxRange(enchantmentLevel))) {
                 return;
             }
 
@@ -315,7 +315,7 @@ public class VisionHandler {
             oldData = VisionConfig.SpecialBlock.TREASURE.get(enchantmentLevel);
         }
 
-        if (!RENDER_DATA.isEmpty() && oldData != null && oldData.range() > 0) {
+        if (!RENDER_DATA.isEmpty() && oldData != null) {
             REMOVAL.add(position.asLong());
         }
 
@@ -325,7 +325,7 @@ public class VisionHandler {
             newData = VisionConfig.SpecialBlock.TREASURE.get(enchantmentLevel);
         }
 
-        if (newData != null && newData.range() > 0) {
+        if (newData != null) {
             RENDER_DATA.put(position.asLong(), new Data(newState, newData, position.getX(), position.getY(), position.getZ()));
         }
     }
@@ -397,7 +397,7 @@ public class VisionHandler {
                         Block block = state.getBlock();
                         VisionConfig.VisionData vision = VisionConfig.get(block, enchantmentLevel);
 
-                        if (vision != null && vision.range() > 0) {
+                        if (vision != null) {
                             SEARCH_RESULT.add(new Data(state, vision, x, y, z));
                         } else if (state.is(AEBlockTags.TREASURES) && hasLoot(player.level(), new BlockPos(x, y, z))) {
                             VisionConfig.VisionData visionData = VisionConfig.SpecialBlock.TREASURE.get(enchantmentLevel);
@@ -438,7 +438,7 @@ public class VisionHandler {
                 // When searching too early, all sections only contain air
                 searchedTooEarly = false;
 
-                if (vision != null && vision.range() > 0) {
+                if (vision != null) {
                     return true;
                 }
 
