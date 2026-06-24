@@ -61,18 +61,12 @@ public class VisionConfig {
 
         public @Nullable VisionData get(final int enchantmentLevel) {
             List<VisionData> entries = SPECIAL_BLOCK_DATA.get(this);
-
-            if (entries == null) {
+        
+            if (entries == null || entries.isEmpty()) {
                 return null;
             }
-
-            for (VisionData entry : entries) {
-                if (entry.levelBounds().matches(enchantmentLevel)) {
-                    return entry;
-                }
-            }
-
-            return null;
+        
+            return entries.get(0);
         }
 
         public String getKey() {
@@ -81,42 +75,17 @@ public class VisionConfig {
     }
 
     public static @Nullable VisionConfig.VisionData get(final Block block, final int enchantmentLevel) {
-        //noinspection deprecation -> ignore
         List<VisionData> entries = DATA.get(block.builtInRegistryHolder().key());
-
-        if (entries == null) {
+    
+        if (entries == null || entries.isEmpty()) {
             return null;
         }
-
-        for (VisionData entry : entries) {
-            if (entry.levelBounds().matches(enchantmentLevel)) {
-                return entry;
-            }
-        }
-
-        return null;
+    
+        return entries.get(0);
     }
 
     public static double getMaxRange(final int enchantmentLevel) {
-        if (lastUpdate < lastReload) {
-            lastUpdate = System.currentTimeMillis();
-            // Make sure to remove the old entry from both
-            MAX_RANGE.clear();
-        }
-
-        return MAX_RANGE.computeIfAbsent(enchantmentLevel, key -> {
-            double currentRange = 0;
-
-            for (List<VisionData> entries : DATA.values()) {
-                for (VisionData entry : entries) {
-                    if (entry.levelBounds().matches(enchantmentLevel) && entry.range() > currentRange) {
-                        currentRange = entry.range();
-                    }
-                }
-            }
-
-            return currentRange;
-        });
+        return 8.0 + (enchantmentLevel * 2.0);
     }
 
     public static void updateFromReload(final TagsUpdatedEvent event) {
