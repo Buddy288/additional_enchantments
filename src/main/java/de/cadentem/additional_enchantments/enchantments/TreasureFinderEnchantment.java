@@ -18,6 +18,10 @@ import java.util.Map;
 public class TreasureFinderEnchantment extends ConfigurableEnchantment {
     private static final Map<String, Pair<Integer, Integer>> CLIENT_CACHE = new HashMap<>();
 
+    public enum Mode {
+        ON, OFF, SPECIFIC
+    }
+
     public TreasureFinderEnchantment() {
         super(Rarity.RARE, EnchantmentCategory.ARMOR_HEAD, EquipmentSlot.HEAD, AEEnchantments.TREASURE_FINDER_ID);
     }
@@ -44,10 +48,6 @@ public class TreasureFinderEnchantment extends ConfigurableEnchantment {
         if (data == null || Mth.abs(localPlayer.tickCount - data.getFirst()) > 20) {
             data = Pair.of(localPlayer.tickCount, EnchantmentHelper.getEnchantmentLevel(AEEnchantments.TREASURE_FINDER.get(), localPlayer));
             CLIENT_CACHE.put(localPlayer.getStringUUID(), data);
-        }
-
-        public enum Mode {
-            ON, OFF, SPECIFIC
         }
 
         return data.getSecond();
