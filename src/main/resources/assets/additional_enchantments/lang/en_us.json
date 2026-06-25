@@ -34,7 +34,7 @@
   "enchantment.additional_enchantments.confusion.desc": "Has a chance to cause the attacked target to retaliate against a nearby entity, dropping you as a target",
   "enchantment.additional_enchantments.treasure_finder": "Treasure Finder",
   "enchantment.additional_enchantments.treasure_finder.desc": "Highlights ores and treasure blocks through walls - range increases with level (cycle configuration with keybind)",
-  "enchantment.additional_enchantments.hunter": "Hunter",
+  "enchantment.additional_enchantments.hunter": "Predator",
   "enchantment.additional_enchantments.hunter.desc": "Causes you to become invisible, gaining hunter stacks while within plant related blocks - attacks will deal increased critical damage at maximum stacks, using them up",
   "enchantment.additional_enchantments.bracewalk": "Bracewalk",
   "enchantment.additional_enchantments.bracewalk.desc": "You are more resistant to knock backs and you will automatically break blocks which slow you down (e.g. cobwebs)",
