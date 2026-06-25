@@ -203,6 +203,10 @@ public class VisionHandler {
                     if (path.contains("/")) {
                         path = path.substring(path.lastIndexOf("/") + 1);
                     }
+                    // Normalize deepslate variants to their base name
+                    if (path.startsWith("deepslate_") && path.endsWith("_ore")) {
+                        path = path.substring("deepslate_".length(), path.length() - "_ore".length()) + "_ore";
+                    }
                     if (!path.equals(currentTarget)) {
                         return;
                     }
